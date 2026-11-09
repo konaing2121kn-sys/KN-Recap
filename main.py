@@ -102,9 +102,21 @@ def translate_claude(texts):
 
 
 def translate_free(texts):
+    import time
     from deep_translator import GoogleTranslator
     tr = GoogleTranslator(source="auto", target="my")
-    return [tr.translate(t) or t for t in texts]
+    out = []
+    for t in texts:
+        for attempt in range(6):
+            try:
+                out.append(tr.translate(t) or t)
+                break
+            except Exception:  # noqa: BLE001  (rate limit etc.)
+                time.sleep(3 * (attempt + 1))
+        else:
+            raise RuntimeError("Free translator is busy. Wait a few minutes and retry.")
+        time.sleep(0.5)  # stay well under the rate limit
+    return out
 
 
 def translate(texts):
