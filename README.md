@@ -1,33 +1,23 @@
-# Burmese AI Dubbing (web app)
+# Burmese Voice-over (web app)
 
-Video upload → English (etc.) speech to text → Burmese translation → Burmese voice → subtitles burned in → MP4.
+1. Upload video -> transcript + Burmese translation (text to read)
+2. Record your own voice, upload the audio
+3. Original audio removed, your voice added, video length matched, subtitles optional -> MP4
 
 ## Files
 - `main.py` – backend (FastAPI)
 - `static/index.html` – phone-friendly web page
-- `requirements.txt`, `Dockerfile` – deploy
+- `requirements.txt`, `Dockerfile` – deploy (Dockerfile is unchanged)
 
 ## Environment variables
 | Name | Meaning | Default |
 |---|---|---|
-| `ANTHROPIC_API_KEY` | Better Burmese translation (Claude). If empty, free Google Translate is used | empty |
-| `ACCESS_CODE` | Password so strangers can't use your server | empty (no password) |
-| `WHISPER_MODEL` | `tiny` / `base` / `small` (bigger = slower, more accurate) | `base` |
-| `TTS_VOICE` | `my-MM-NilarNeural` (female) or `my-MM-ThihaNeural` (male) | Nilar |
-| `BG_VOLUME` | Keep original audio quietly, e.g. `0.1`. `0` = remove | `0` |
-| `MAX_UPLOAD_MB` | Upload limit | `300` |
+| `ANTHROPIC_API_KEY` | Better Burmese translation (Claude). Empty = free Google Translate (often rate-limited on shared hosts) | empty |
+| `ACCESS_CODE` | Password so strangers can't use your server | empty |
+| `WHISPER_MODEL` | `tiny` / `base` / `small` | `base` |
+| `MAX_UPLOAD_MB` | Video upload limit | `300` |
+| `STRETCH_MIN` / `STRETCH_MAX` | Video is slowed/sped up only inside this ratio range to match your audio; outside it the video is trimmed or the last frame is held | `0.7` / `1.4` |
 
-## Deploy from a phone (Render / Railway)
-1. Create a GitHub account, make a new repository, upload all these files (keep the `static` folder).
-2. On Render.com (or Railway.app): New → Web Service → connect the repository → it detects the `Dockerfile`.
-3. Add the environment variables above (at least `ACCESS_CODE`).
-4. Open the URL it gives you in your phone browser.
-
-Note: free tiers have little RAM/CPU, so use `WHISPER_MODEL=tiny` or `base` and short videos (1–3 minutes) first. Files in `jobs/` are lost when the server restarts, so download your result right away.
-
-## Run on a computer (optional)
-```
-pip install -r requirements.txt
-# ffmpeg must be installed
-uvicorn main:app --port 8000
-```
+## Notes
+- Free hosts sleep and lose files after idle time. If the server was asleep between step 1 and step 3, the page re-sends the video automatically (keep the page open).
+- Use short videos (1-3 min) on free tiers.
