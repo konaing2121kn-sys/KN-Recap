@@ -2,6 +2,5 @@ fastapi
 uvicorn[standard]
 python-multipart
 faster-whisper
-edge-tts
 anthropic
 deep-translator
